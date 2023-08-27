@@ -1,0 +1,111 @@
+/*
+ * FLIPFLOP FOR 11 LEDS WITH DIMMING LIGHT IN THE SAME TIME. 
+ */
+const int numLeds = 11;
+int pinLeds[] = {2,3,4,5,6,7,8,9,10,11,12};
+unsigned int oneCyclesTime = 5000;       // in us unit
+         int analogLeds[numLeds] = {0,20,40,80,100,120,140,160,180,200,250} ;       // time for the leds become On at first time in one cycle
+const int maksAnalogLeds = 10000;
+const int minAnalogLeds = 0; 
+unsigned int delayLeds[numLeds];        // time the Leds off after one cycle
+unsigned long prevTime[numLeds];         // previous time as initial time
+int i,j;
+int increCON[numLeds];
+unsigned int timeCON = 0; 
+
+void setup() {
+  // Set the pins mode
+  for(i=0; i<numLeds; i++) {
+    pinMode(pinLeds[i],OUTPUT);
+    prevTime[i] = micros();
+    increCON[i] = 100;
+  }
+    Serial.begin(9600);
+}
+void loop() {
+  // put your main code here, to run repeatedly:
+  long timeLong = 5000;   // in ms
+  long prevTimeLong = millis();
+  
+  while(1) {
+    starsmode(millis());
+    if (timeLong<(millis()-prevTimeLong)) {
+    break; }
+  }
+
+  while(2*timeLong<(millis()-prevTimeLong)) {
+  starsmodetiming(micros()); }
+
+  for(j=0;j<5;j++) { 
+  blinkinglamp();
+  }
+}
+
+
+// Fungsi ini untuk menyalakan Leds terang dan gelap seperti nyala bintang
+void starsmode(long timeNow)  {
+  // Periksa waktu leds apakah belum mencapai waktu satu cycle pulsa OnOff, jika benar tambahkan waktu delay On
+  // jika salah (telah mencapai satu cycle) update prevTime
+  for(i=0;i<numLeds;i++)  {
+    timeCON = timeNow-prevTime[i];                  // Hitung timing masing-masing Leds 
+    if(timeCON < oneCyclesTime/50) {                   // Periksa, apakah timing leds sudah sampai dalam satu cycle
+      if(timeCON < analogLeds[i]) {                 // Periksa, apakah timing masih lebih rendah daripada timing 
+         if(analogLeds[i]<0) {
+          analogWrite(pinLeds[i],0);
+         }
+         else {
+         analogWrite(pinLeds[i],analogLeds[i]); }   // Leds ON ketika timing masih lebih kecil dari nilai analogLEDS
+      }
+    }
+    else {                                          // Jika timing telah lebih dari satu cycle, naikkan nilai analogLEDS atau kurangkan timing ON
+      analogLeds[i]=analogLeds[i]+increCON[i];      // Merubah nilai analogLeds dengan penambahan nilai increCON. increCON dapat bernilai positif atau negatif
+      prevTime[i] = millis();  }
+      
+   if(analogLeds[i]> maksAnalogLeds/50) {             // Jika nilai analogLeds sudah mencapailebih dari nilai maksimum, ubah menjadi nilai maksimum
+     analogLeds[i] = maksAnalogLeds/50;
+     increCON[i] = -random(10,25);   }
+   if(analogLeds[i] < -100) {
+     analogLeds[i] = minAnalogLeds;                // Jika nilai analogLeds sudah bernilai 0, ubah menjadi nilai minimum
+     increCON[i] = random(10,25);    }
+ }      // end of For    
+}       // end of Void
+
+// Fungsi ini untuk menyalakan Leds terang dan gelap seperti nyala bintang
+void starsmodetiming(long timeNow)  {
+  // Periksa waktu leds apakah belum mencapai waktu satu cycle pulsa OnOff, jika benar tambahkan waktu delay On
+  // jika salah (telah mencapai satu cycle) update prevTime
+  for(i=0;i<numLeds;i++)  {
+    timeCON = timeNow-prevTime[i];                  // Hitung timing masing-masing Leds 
+    if(timeCON < oneCyclesTime) {                   // Periksa, apakah timing leds sudah sampai dalam satu cycle
+      if(timeCON < analogLeds[i]) {                 // Periksa, apakah timing masih lebih rendah daripada timing 
+         digitalWrite(pinLeds[i],LOW);}
+         else {
+         digitalWrite(pinLeds[i],HIGH); }   // Leds ON ketika timing masih lebih kecil dari nilai analogLEDS
+      }
+    else {                                          // Jika timing telah lebih dari satu cycle, naikkan nilai analogLEDS atau kurangkan timing ON
+      analogLeds[i]=analogLeds[i]+increCON[i];      // Merubah nilai analogLeds dengan penambahan nilai increCON. increCON dapat bernilai positif atau negatif
+      prevTime[i] = micros();  }      
+   if(analogLeds[i]>= maksAnalogLeds) {             // Jika nilai analogLeds sudah mencapailebih dari nilai maksimum, ubah menjadi nilai maksimum
+      analogLeds[i] = maksAnalogLeds;
+      increCON[i] = -random(10,50);   }
+   if(analogLeds[i] <= 0) {
+      analogLeds[i] = minAnalogLeds;                // Jika nilai analogLeds sudah bernilai 0, ubah menjadi nilai minimum
+      increCON[i] = random(10,50);    }
+ }      // end of For    
+}       // end of Void
+
+
+void blinkinglamp(void) {
+  for(i=0;i<numLeds/2+1;i++) {
+    digitalWrite(pinLeds[i],HIGH);
+    digitalWrite(pinLeds[numLeds-i],HIGH);
+    delay(200);
+  } 
+  for(i=0;i<numLeds/2+1;i++) {
+    digitalWrite(pinLeds[numLeds/2-i],LOW);
+    digitalWrite(pinLeds[numLeds/2+i],LOW);
+    delay(200);
+  }
+}
+
+
