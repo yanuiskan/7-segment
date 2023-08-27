@@ -1,0 +1,33 @@
+int ledPins[] = {2, 3, 4, 5, 6, 7, 8};
+int pinCount = 7;
+// konfigurasi led          a  b  c  d  e  f  g
+int number[10][7]={        {1, 1, 1, 1, 1, 1, 0}, 
+                           {0, 1, 1, 0, 0, 0, 0}, 
+                           {1, 1, 0, 1, 1, 0, 1}, 
+                           {1, 1, 1, 1, 0, 0, 1}, 
+                           {0, 1, 1, 0, 0, 1, 1}, 
+                           {1, 0, 1, 1, 0, 1, 1}, 
+                           {1, 0, 1, 1, 1, 1, 1}, 
+                           {1, 1, 1, 0, 0, 0, 0}, 
+                           {1, 1, 1, 1, 1, 1, 1}, 
+                           {1, 1, 1, 1, 0, 1, 1}}; 
+void setup() {                
+for (int j=0; j<pinCount; j++)  {
+          pinMode(ledPins[j], OUTPUT);   
+}  
+    for (int j=0; j<pinCount; j++)  {
+        digitalWrite(ledPins[j], HIGH);      
+          }
+  delay(5000);
+}
+
+void loop() {
+    for (int i=0; i<10; i++)  {
+        for (int j=0; j<pinCount; j++)  {
+          digitalWrite(ledPins[j], number[i][j]);  
+        }
+        delay(500);               // wait for a second
+      }
+}
+
+7
